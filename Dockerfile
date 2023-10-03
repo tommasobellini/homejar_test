@@ -4,4 +4,8 @@ ENV PYTHONPATH ${PYTHONPATH}:/app
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
 COPY . .
-CMD ["uvicorn", "app.main:app", "--reload", "--host", "0.0.0.0", "--port", "5000"]
+# Expose the port on which the application will run
+EXPOSE 8080
+
+# Run the FastAPI application using uvicorn server
+CMD ["uvicorn", "app.main:app", "--reload", "--host", "0.0.0.0", "--port", "8080"]
