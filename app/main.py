@@ -5,6 +5,7 @@ from typing import List
 from dotenv import dotenv_values
 from fastapi import FastAPI, HTTPException
 import uvicorn
+from fastapi.encoders import jsonable_encoder
 from fastapi.params import Body, Depends
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, Boolean, JSON
 from sqlalchemy.dialects.postgresql import UUID
@@ -62,13 +63,11 @@ class UserModel(BaseModel):
 def create_tables():
     Base.metadata.create_all(bind=engine)
 
-def get_users(db: Session = Depends(get_db)):
-    users = db.query(UserModel).all()
-    return users
 
 @app.get("/homejar/users", response_description="List all users", response_model=List[UserSchema])
-async def list_users(limit: int = 15):
-    return get_users()
+async def list_users(limit: int = 15, db: Session = Depends(get_db)):
+    users = db.query(UserModel).all()
+    return jsonable_encoder(users)
 
 
 @app.post("/homejar/users", response_description="Add new user", response_model=UserSchema)
