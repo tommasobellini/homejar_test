@@ -62,13 +62,16 @@ class UserModel(BaseModel):
 def create_tables():
     Base.metadata.create_all(bind=engine)
 
-
-@app.get("/users", response_description="List all users", response_model=List[UserSchema])
-async def list_users(limit: int = 15):
-    users = []
+def get_users(db: Session = Depends(get_db)):
+    users = db.query(UserModel).all()
     return users
 
-@app.post("/users", response_description="Add new user", response_model=UserSchema)
+@app.get("/homejar/users", response_description="List all users", response_model=List[UserSchema])
+async def list_users(limit: int = 15):
+    return get_users()
+
+
+@app.post("/homejar/users", response_description="Add new user", response_model=UserSchema)
 async def create_user(body: UserSchema = Body(...), db: Session = Depends(get_db)):
     user_id = uuid.uuid4()
     body.id = str(user_id)
